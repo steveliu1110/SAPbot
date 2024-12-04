@@ -1,0 +1,157 @@
+{% load static tailwind_tags %}
+<head>
+  {% tailwind_css %}
+  <title>Admin</title>
+  {% load static %}
+</head>
+{% block content %}
+<div class="bg-gray-100 dark:bg-gray-900 transition-all overflow-hidden">
+
+    <!-- Sidebar -->
+    <div class="flex">
+        <div class="w-64 bg-gray-800 text-white h-screen">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold">Dashboard</h1>
+                <ul class="mt-8">
+                    <li><a href="#" class="block py-2">Home</a></li>
+                    <li><a href="#" class="block py-2">Settings</a></li>
+                    <li><a href="#" class="block py-2">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6 overflow-y-auto h-[calc(100vh-10px)]">
+            <div class="flex justify-center items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
+                SAP Urls
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-8 h-[calc(100vh-450px)] z-20">
+                <!-- Table Header with Buttons -->
+                <div class="flex justify-between items-center w-full mb-4">
+                    <div class="flex">
+                        <form method="GET" action="">
+                            <input type="text" name="search" value="{{ search_query }}" class="px-4 py-2 border border-gray-300 rounded-lg mr-2" placeholder="Search by URL..."/>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Search</button>
+                        </form>
+                    </div>
+                    <!-- Button to trigger modal -->
+                    <div class="flex space-x-4">
+                        <button id="addButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2">Add</button>
+                        <button id="updateButton" class="px-4 py-2 bg-green-500 text-white rounded-lg mr-2">Update</button>
+                    </div>
+                    <!-- <button class="px-4 py-2 bg-red-1000 text-white rounded-lg ml-2">Delete</button> -->
+                </div>
+            
+                <!-- Table -->
+                <div class="overflow-x-auto h-[calc(100%-100px)]">
+                    <table class="min-w-full table-auto">
+                        <!-- Table Header -->
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
+                                <th class="px-4 py-2 text-left w-10"> </th> <!-- Small width for checkbox -->
+                                <th class="px-4 py-2 text-left w-16">No</th> <!-- Short width for No -->
+                                <th class="px-4 py-2 text-left w-1/3">
+                                    <div class="flex items-center">
+                                        Website Url
+                                        <div class="w-4 h-4 justify-center"> <!-- Adjust the size as needed -->
+                                            <a href="?sort=website_url">
+                                                <svg class="w-full h-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </th> <!-- Wide width for URL -->
+                                <th class="px-4 py-2 text-left w-24">
+                                    <div class="flex items-center">
+                                        Chunk Count
+                                        <div class="w-4 h-4"> <!-- Adjust the size as needed -->
+                                            <a href="?sort=chunk_count">
+                                                <svg class="w-full h-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </th> <!-- Slightly larger for numbers -->
+                                <th class="px-4 py-2 text-left w-48">
+                                    <div class="flex items-center">
+                                        Last Update
+                                        <div class="w-4 h-4"> <!-- Adjust the size as needed -->
+                                            <a href="?sort=last_update">
+                                                <svg class="w-full h-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8.574 11.024h6.852a2.075 2.075 0 0 0 1.847-1.086 1.9 1.9 0 0 0-.11-1.986L13.736 2.9a2.122 2.122 0 0 0-3.472 0L6.837 7.952a1.9 1.9 0 0 0-.11 1.986 2.074 2.074 0 0 0 1.847 1.086Zm6.852 1.952H8.574a2.072 2.072 0 0 0-1.847 1.087 1.9 1.9 0 0 0 .11 1.985l3.426 5.05a2.123 2.123 0 0 0 3.472 0l3.427-5.05a1.9 1.9 0 0 0 .11-1.985 2.074 2.074 0 0 0-1.846-1.087Z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </th> <!-- Enough width for date & time -->
+                            </tr>
+                        </thead>
+            
+                        <!-- Table Body -->
+                        <tbody class="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                            {% for website in websites %}
+                            <tr>
+                                <td class="px-4 py-2 text-left">
+                                    <input type="checkbox" name="urlcheckbox" class="w-6 h-6 rounded-full border-gray-300" data-url="{{ website.url }}"/>
+                                </td>
+                                <td class="px-4 py-2 text-left">{{ forloop.counter }}</td> <!-- Row number -->
+                                <td class="px-4 py-2 text-left">
+                                    <a href="{{ website.url }}" class="text-blue-500 hover:text-blue-700" target="_blank" rel="noopener noreferrer">
+                                        {{ website.url }}
+                                    </a>
+                                </td>
+                                <td class="px-4 py-2 text-left">{{ website.chunk_count }}</td>
+                                <td class="px-4 py-2 text-left">{{ website.last_update }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-4 py-2 text-center">No websites available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modal for adding a new website -->
+                <div id="addWebsiteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+                        <h2 class="text-2xl text-gray-800 dark:text-white mb-4">Add Website</h2>
+                        
+                        <!-- Form to add a new website -->
+                        <form method="POST" id="addWebsiteForm" action="{% url 'add_websites' %}">
+                            {% csrf_token %}
+                            <div class="mb-4 h-80 max-h-80">
+                                <!-- Textarea with fixed height -->
+                                <textarea name="url" id="websites" rows="90" class="w-full min-h-60 px-4 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600" placeholder="e.g. www.freelancer.com" required style="height: 72px; resize: none;"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="button" id="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-lg mr-2">Cancel</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ChatGPT-like input and display box -->
+            
+
+            
+        </div>
+        <div class="bg-gray-800 p-4 shadow-lg fixed bottom-0 right-0 border-white-1 border w-[calc(100%-256px)]">
+
+            <h3 class="text-xl font-semibold text-gray-800 text-white mb-1">Scraping State</h3>
+            
+            <!-- Chat Output with Fixed Width and Scrollbar -->
+            <textarea id="scrapystate" class="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-x-auto h-64 w-full relative mb-2" value=""></textarea>
+            <button id="clearTerminal" class="px-1 py-1 bg-gray-500 text-white rounded-lg mr-2 text-sm">Clear Terminal</button>
+        </div>
+    </div>
+
+    <script src="{% static 'js/adminaction.js' %}"></script>
+</div>
+{% endblock %}

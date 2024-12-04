@@ -1,0 +1,62 @@
+{% load static tailwind_tags %}
+<head>
+  {% tailwind_css %}
+  <title>Home</title>
+  {% load static %}
+</head>
+{% block content %}
+<div class="bg-gray-100 dark:bg-gray-900 transition-all">
+
+    <!-- Sidebar -->
+    <div class="flex">
+        <div class="w-64 bg-gray-800 text-white h-screen">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold">Chat History</h1>
+                <ul class="mt-8">
+                    <li><a href="#" class="block py-2">Home</a></li>
+                    <li><a href="#" class="block py-2">Settings</a></li>
+                    <li><a href="#" class="block py-2">Reports</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            
+            <!-- Navbar with Dark Mode Toggle -->
+            <div class="flex justify-between items-center mb-6">
+                <button id="new-chat-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg">
+                    New Chat
+                </button>
+                <div class="text-2xl font-semibold text-gray-800 dark:text-white">SAP FireCrawl v1.0</div>
+                <button id="theme-toggle" class="w-10 h-10 bg-gray-200 rounded-full dark:bg-gray-700 flex items-center justify-center">
+                    <svg id="sun-icon" class="w-6 h-6 text-yellow-400 dark:text-yellow-300 hidden" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 3a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0V5a4.5 4.5 0 0 1 9 0v1a1 1 0 1 0 2 0V4a6.5 6.5 0 0 0-13 0v2a1 1 0 0 0-1-1zM4 11a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2H4zm14 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2h-2zM12 3a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0V4a4.5 4.5 0 0 1 0 9v1a1 1 0 1 0 2 0v-2a6.5 6.5 0 0 0-13 0v1a1 1 0 1 0 2 0V4a4.5 4.5 0 0 1 9 0v2a1 1 0 1 0 2 0V4a6.5 6.5 0 0 0-13 0z"></path></svg>
+                    <svg id="moon-icon" class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 12a6 6 0 0 0-5.3-5.9A8.96 8.96 0 0 1 12 3a9 9 0 1 0 9 9c0-.8-.1-1.6-.3-2.3a6.2 6.2 0 0 0-3.7-.7 6 6 0 0 0-5.5 2.2c-.8-1-2-1.7-3.4-2a6.3 6.3 0 0 0-3 1 6 6 0 0 0-2.5 4.8C6.5 14.6 9.4 16 12 16c3.3 0 6-2.7 6-6z"></path></svg>
+                </button>
+            </div>
+
+            <!-- ChatGPT-like input and display box -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-8 -px-8 h-[calc(100vh-110px)] border border-black relative">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Chat Box</h3>
+            
+                <!-- Chat Output with Fixed Width and Scrollbar -->
+                <div id="chat-output" class="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-x-auto w-full mb-4">
+                    <!-- Chat output will appear here -->
+                </div>
+            
+                <!-- Input box with Send button embedded -->
+                <div class="absolute bottom-1 w-[calc(100%-40px)]">
+                    <div class="relative">
+                        <textarea id="chat-input" class="w-full p-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-sm pr-16" rows="1" placeholder="Type your message..."></textarea>
+                        <button id="send-btn" class="absolute top-2 right-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Send</button>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/chat.js' %}"></script>
+</div>
+{% endblock %}

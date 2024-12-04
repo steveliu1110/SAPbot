@@ -1,0 +1,9 @@
+langchain 
+langchain-community 
+groq 
+faiss-cpu 
+ollama 
+firecrawl-py
+openai
+python-dotenv
+langchain_ollama
