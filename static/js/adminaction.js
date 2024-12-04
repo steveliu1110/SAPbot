@@ -1,4 +1,6 @@
 var flag = 0; // 'start', ''
+
+displaylog();
 const addButton = document.getElementById("addButton");
 const addWebsiteModal = document.getElementById("addWebsiteModal");
 const closeModal = document.getElementById("closeModal");
@@ -37,24 +39,23 @@ addWebsiteForm.addEventListener('submit', function(event) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message) {
-            alert(data.message);  // Show success message
+        if (data.status) {
+            addlog(data.result + ' websites successfully added!');
             addWebsiteModal.classList.add('hidden');  // Close the modal
+            location.reload();
 
         } else {
-            alert('Error: ' + data.error);  // Show error message
+            addlog('server error');
         }
     })
     .catch(error => {
-        alert('There was an error submitting the form', error);
-        print(error)
+        addlog('There was an error submitting the form', error);
     });
 });
 
 
 
 const updateButton = document.getElementById('updateButton');
-const scrapystate = document.getElementById('scrapystate');
 
 function originButton(){
     flag = false;
@@ -78,7 +79,7 @@ updateButton.onclick = () => {
         flag = false;
         changeCheckbox(false)
         originButton();
-        scrapystate.value += "⛔Stop scrapying...\n";
+        addlog("⛔Stop scrapying...\n");
         return;
     }
     const checkboxes = document.querySelectorAll('input[name="urlcheckbox"]:checked'); 
@@ -88,15 +89,13 @@ updateButton.onclick = () => {
     }); 
     count = selectedUrls.length;
     if(count == 0){
-        scrapystate.value += "⚠️ Pleas select the websites for updating\n";
-        scrapystate.scrollTo(0,10000);
+        addlog("⚠️ Pleas select the websites for updating\n");
         return;
     }
     index = 0;
     flag = true;
     changeCheckbox(true);
-    scrapystate.value += "🚀Start scrapying for selected websites...\n\n"
-    scrapystate.scrollTo(0,10000);
+    addlog("🚀Start scrapying for selected websites...\n\n");
     updateButton.innerHTML = "Stop Updating";
     if (updateButton.classList.contains('bg-green-500')) {
         updateButton.classList.remove('bg-green-500');
@@ -108,15 +107,13 @@ updateButton.onclick = () => {
 function updateOneByOne(index, selectedUrls){
     if(index >= selectedUrls.length){
         originButton();
-        scrapystate.value += "🔚Completed updating!\n";
-        scrapystate.scrollTo(0,10000);
+        addlog("🔚Completed updating!\n");
         changeCheckbox(false);
         return;
     }
-    scrapystate.value += "⚡Starting scrapying for 🌐" + selectedUrls[index] + "🌐\n";
+    addlog("⚡Starting scrapying for 🌐" + selectedUrls[index] + "🌐\n");
     if(!flag){  
-        scrapystate.value += "✋Scraping Stopped By User\n";
-        scrapystate.scrollTo(0,10000);
+        addlog("✋Scraping Stopped By User\n");
         changeCheckbox(false);
         return;
     }
@@ -132,22 +129,22 @@ function updateOneByOne(index, selectedUrls){
             console.log(data)
             if(data.status){
                 console.log(data)
-                scrapystate.value += "Successfully completed scrapying for website 🌐" + data.result[0] + "🌐\n";
-                scrapystate.value += "                Chunk Count is " + data.result[1] + "\n";
-                scrapystate.value += "                Updated Date is " + data.result[2] + "\n";
-                scrapystate.value += "\n";
-                scrapystate.scrollTo(0,10000);
+                let log = '';
+                log += "Successfully completed scrapying for website 🌐" + data.result[0] + "🌐\n";
+                log += "                Chunk Count is " + data.result[1] + "\n";
+                log += "                Updated Date is " + data.result[2];
+                addlog(log);
             }
             else{
-                scrapystate.value += "Failed with scrapying for website " + selectedUrls[index] + "\n";
-                scrapystate.value += "Error occured " + data.message+ "\n";
-                scrapystate.value += "\n";
-                scrapystate.scrollTo(0,10000);
+                let log = '';
+                log += "Failed with scrapying for website " + selectedUrls[index] + "\n";
+                log += "Error occured " + data.message+ "\n";
+                addlog(log)
             }
             updateOneByOne(index + 1, selectedUrls)
         })
         .catch(error => {
-            scrapystate.value += "Successfully completed scrapying for website 🌐" + data.result[0] + "🌐\n";
+            addlog("Successfully completed scrapying for website 🌐" + data.result[0] + "🌐\n");
             alert('Failed to update selected websites.');
             updateOneByOne(index + 1, selectedUrls)
         });
@@ -161,5 +158,32 @@ function updateOneByOne(index, selectedUrls){
 const clearButton = document.getElementById('clearTerminal');
 
 clearButton.onclick = () => {
-    scrapystate.value = '';
+    clearLogs();
+}
+
+
+const selectAll = document.getElementById("selectAll");
+
+selectAll.addEventListener("change", () => {
+    const checkboxes = document.querySelectorAll('input[name="urlcheckbox"]');
+    if (selectAll.checked) {
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = true; // Disable each checkbox
+        });
+        addlog(checkboxes.length + ' websites are selected');
+    } else {
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = false; // Disable each checkbox
+        });
+        addlog('No websites are selected');
+    }
+})
+
+function handleSelected(self) {
+    const url = self.getAttribute('data-url');
+    if(!self.checked){
+        addlog('➖ ' + url + ' released');
+        return;
+    }
+    addlog('➕ ' + url + ' selected');
 }

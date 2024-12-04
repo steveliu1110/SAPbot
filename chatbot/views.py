@@ -33,8 +33,13 @@ def website_list(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def adminDash(request):
-    # Fetch all Website entries from the database
-    websites = Website.objects.all()
+    sort = request.GET.get('sort', 'last_update')  # Default sort by 'name'
+    direction = request.GET.get('direction', 'asc')  # Default sort direction 'asc'
+
+    if direction == 'desc':
+        sort = f"-{sort}"
+
+    websites = Website.objects.all().order_by(sort)
 
     # Check if the form is submitted to add a new website
     if request.method == 'POST':
@@ -46,6 +51,8 @@ def adminDash(request):
 
     return render(request, 'admindash.html', {
         'websites': websites,
+        'current_sort': sort.lstrip('-'),
+        'current_direction': direction,
         'form': form
     })
 
@@ -65,25 +72,25 @@ def add_websites(request):
     if request.method == 'POST':
         # Get the list of websites from the form data
         websites_text = request.POST.get('websites')
-        print(websites_text)
         # Split the websites string into a list of URLs (one per line)
         websites_text = websites_text.replace(" ", "")
         website_urls = [url.strip() for url in websites_text.split("\n")]
-        print(website_urls,'wewe')
+        result = 0
         # Add each website to the database
         for url in website_urls:
 
             if url == "":
                 continue
             # You can customize this to add other data like chunk_count, last_update
-            print(url, '----')
             if not Website.objects.filter(url=url).exists():
+                print('New url ' + url + 'added')
                 Website.objects.create(url=url, chunk_count=0, last_update="Not Scraped Yet")
+                result = result + 1
         
         # Return a success response (you can also return a JSON response or redirect if necessary)
-        return JsonResponse({'message': 'Websites added successfully'})
+        return JsonResponse({'status': True,'message': 'Selected websites updated successfully!', 'result' : result})
     
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+    return JsonResponse({'status': False,'message': 'Invalid request method'}, status=400)
 
 @csrf_exempt  # Disable CSRF for simplicity, but use CSRF token in production
 def update_websites(request):
