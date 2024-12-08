@@ -4,6 +4,13 @@ groq
 faiss-cpu 
 ollama 
 firecrawl-py
-openai==0.28
+openai
 python-dotenv
 langchain_ollama
+django
+django-tailwind
+django_browser_reload
+langchain_chroma
+langchain_openai
+chromadb
+uuid

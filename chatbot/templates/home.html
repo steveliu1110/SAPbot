@@ -2,20 +2,32 @@
 <head>
   {% tailwind_css %}
   <title>Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   {% load static %}
 </head>
 {% block content %}
 <div class="bg-gray-100 dark:bg-gray-900 transition-all">
-
+    <div
+        class="hidden"
+        id="django-data"
+        data-page="{{ page }}"
+        data-session="{{ session_id }}"
+        data-messages="{{ messages }}"
+    >
+    </div>
     <!-- Sidebar -->
     <div class="flex">
-        <div class="w-64 bg-gray-800 text-white h-screen">
+        <div class="w-64 bg-gray-800 h-screen overflow-y-auto min-w-64">
             <div class="p-6">
-                <h1 class="text-2xl font-bold">Chat History</h1>
+                <h1 class="text-2xl font-bold text-white">Chat History</h1>
                 <ul class="mt-8">
-                    <li><a href="#" class="block py-2">Home</a></li>
-                    <li><a href="#" class="block py-2">Settings</a></li>
-                    <li><a href="#" class="block py-2">Reports</a></li>
+                    {% for session in chat_sessions %}
+                    <li class="flex items-center bg-gray-400 mb-2 rounded-sm text-gray-800 relative" data-session_id="{{ session.session_id }}">
+                        <a href="/chat/session/{{ session.session_id }}" class="block text-gray-800 h-6 py-0.4 px-1 mr-2">{{ session.name }}</a>
+                        <i class="absolute fa-solid fa-pen-to-square right-4"></i>
+                        <i class="absolute fa-solid fa-trash right-0" onclick="deleteSession(this);"></i>
+                    </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>
@@ -41,7 +53,13 @@
             
                 <!-- Chat Output with Fixed Width and Scrollbar -->
                 <div id="chat-output" class="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-x-auto w-full mb-4">
-                    <!-- Chat output will appear here -->
+                    {% for message in messages %}
+                        {% if message.role == 'user' %}
+                        <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white p-2 rounded-lg my-2">😎 : {{message.content}}</div>
+                        {% elif message.role == 'assistant' %}
+                        <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white p-2 rounded-lg my-2">🤖 : {{message.content}}</div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             
                 <!-- Input box with Send button embedded -->
@@ -56,7 +74,7 @@
             </div>
         </div>
     </div>
-
+    <script src="{% static 'js/utils.js' %}"></script>
     <script src="{% static 'js/chat.js' %}"></script>
 </div>
 {% endblock %}

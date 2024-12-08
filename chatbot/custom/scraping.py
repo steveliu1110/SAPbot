@@ -10,6 +10,7 @@ from datetime import datetime
 from .vstore import updateChroma, getVectorStore
 from .sqlstore import update_scrapy_data
 
+from ..models import Website
 load_dotenv()
 
 # update the scrapy data for multiple websites
