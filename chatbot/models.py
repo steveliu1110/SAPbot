@@ -17,7 +17,7 @@ class ChatSession(models.Model):
     Represents a chat session between a user and the GPT model.
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_sessions")
-    name = models.CharField(max_length=100, default="Empty Session", help_text="Unique name for the session")
+    name = models.CharField(max_length=100, default="New Chat", help_text="Unique name for the session")
     session_id = models.CharField(max_length=100, unique=True, default=uuid.uuid4, help_text="Unique identifier for the session")
     created_at = models.DateTimeField(auto_now_add=True)
 

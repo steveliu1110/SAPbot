@@ -1,91 +1,106 @@
 const djangoData = document.getElementById('django-data');
+const about = document.getElementById('about');
+const botTitle = document.getElementById('bot-title');
 
-
-const themeToggleBtn = document.getElementById('theme-toggle');
-const sunIcon = document.getElementById('sun-icon');
-const moonIcon = document.getElementById('moon-icon');
-const body = document.body;
-
-themeToggleBtn.addEventListener('click', () => {
-	// Toggle between light and dark theme
-	body.classList.toggle('dark');
-	
-	// Toggle visibility of the sun and moon icons
-	sunIcon.classList.toggle('hidden');
-	moonIcon.classList.toggle('hidden');
-});
-
-// New Chat Button Logic
 const newChatBtn = document.getElementById('new-chat-btn');
 const chatInput = document.getElementById('chat-input');
 const chatOutput = document.getElementById('chat-output');
 
-newChatBtn.addEventListener('click', () => {
-	// Clear chat output and input
-	// chatOutput.innerHTML = '';
-	// chatInput.value = '';
+newChatBtn.onclick = () => {
+	location.href = '/home';
+}
 
-	// // Optionally toggle theme when New Chat is clicked as well
-	// body.classList.toggle('dark');
-	// sunIcon.classList.toggle('hidden');
-	// moonIcon.classList.toggle('hidden');
-	const token = getCookie('csrftoken');
-	alert(token)
-
-	fetch("/chat/new", {
-		method: 'POST',
-		headers: {
-			'X-CSRFToken': token
-		},
-		body : new FormData()
-	})
-	.then(res => res.json())
-	.then(async (data) => {
-		console.log(data)
-		if(data.status){
-			console.log(data)
-			alert(data)
-			location.href = "/chat/session/" + data.session_id;
-		}
-		else{
-			alert("error occured!");
-		}
-	})
-	.catch(error => {
-		alert('hhh' + error);
-	});
-});
-
-// Chat Input and Output Logic
 const sendBtn = document.getElementById('send-btn');
 
 function answerDiv(){
-	const answerDiv = document.createElement('div');
-	answerDiv.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-800', 'dark:text-white', 'p-2', 'rounded-lg', 'my-2');
-	answerDiv.textContent = '🤖 : ';
-	return answerDiv;
+	const div = document.createElement('div');
+	div.classList.add('text-white', 'p-2', 'my-2', 'flex-1', 'flex');
+
+	const img = document.createElement('img');
+	img.src = '/static/png/bot.png';
+	img.classList.add('rounded-full', 'w-10', 'h-10', 'mr-2');
+
+	const span = document.createElement('span');
+	span.classList.add('mr-0');
+	span.innerHTML = 'Bot <br>'
+
+	div.appendChild(img);
+	div.appendChild(span);
+
+	return div;
 }
-sendBtn.addEventListener('click', () => {
+function appendQuery(query, parent){
+	const htmlString = `
+		<div class="text-white p-2 my-2 flex-1 flex">
+			<img src="/static/png/you.jpg" class="rounded-full w-10 h-10 mr-2" />
+			<span class="mr-0">You<br>
+				${query}
+			</span>
+		</div>
+	`;
+
+	parent.insertAdjacentHTML('beforeend', htmlString);
+}
+
+sendBtn.addEventListener('click', async() => {
 	const page = djangoData.getAttribute('data-page');
 	const query = chatInput.value.trim();
+	appendQuery(query, chatOutput);
+	const answer = answerDiv();
+	const answerSpan = answer.children[1];
+	chatOutput.append(answer);
 
 	if(page == 'home'){
+		if (botTitle.classList.contains('hidden')) {
+			botTitle.classList.remove('hidden');
+		}
+
+		about.hidden = 'true';
 		const formData = new FormData();
 		formData.append('query', query);
 		try{
 			fetch("/chat/new", {
 				method: 'POST',
-				body: formData
+				body: formData,
 			})
-			.then(res => res.json())
-			.then((res) => {
-				if (res.status) {
-					const session_id = res.session_id;
-					location.href = "/chat/session/" + session_id;
-				}				
+			.then(async (res) => {
+				if (!res.ok) {
+					answerSpan.innerHTML +='Server Backend Error';
+					return;
+				}
+			
+				const reader = res.body.getReader();
+				const decoder = new TextDecoder('utf-8');
+				
+				console.log('werwerwer')
+				let done = false;
+			
+				// Process the stream in chunks
+				while (!done) {
+					const { value, done: streamDone } = await reader.read();
+					done = streamDone;
+			
+					// Decode the current chunk of data and append it to the text
+					let piece = decoder.decode(value, { stream: true });
+					if(piece == 'None' || piece == '') continue;
+					answerSpan.innerHTML += piece;
+			
+				}
+				fetch('/getnewsession', {
+					method: 'GET'
+				})
+				.then(res => res.json())
+				.then((res) => {
+					if(res.status){
+						location.href = '/chat/session/' + res.session_id;
+						return;
+					}
+				})
+				
 			})
 			.catch(error => {
-				alert(str(error));
+				console.log(error)
+				answerSpan.innerHTML +="I am sorry, there is some problem with server host!";
 			});
 		}catch(err){
 			alert(str(err))
@@ -93,22 +108,14 @@ sendBtn.addEventListener('click', () => {
 	}
 	if(page == 'chat'){
 		const session_id = djangoData.getAttribute('data-session');
-		ask_query(query, session_id);
+		ask_query(query, session_id, answerSpan);
 	}
-
-	
 });
 
-const ask_query = (query, session_id) => {
-	const queryDiv = document.createElement('div');
-	queryDiv.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-800', 'dark:text-white', 'p-2', 'rounded-lg', 'my-2');
-	queryDiv.textContent = '😎 : ' + query;
-	chatOutput.appendChild(queryDiv);
-
+const ask_query = (query, session_id, answerSpan) => {
 	const formData = new FormData();
 	formData.append('query', query);
 	formData.append('session_id', session_id);
-	const answer = answerDiv();
 	try{
 		fetch("/ask", {
 			method: 'POST',
@@ -116,7 +123,7 @@ const ask_query = (query, session_id) => {
 		})
 		.then(async (res) => {
 			if (!res.ok) {
-				answer.textContent +='Server Backend Error';
+				answerSpan.innerHTML +='Server Backend Error';
 				return;
 			}
 		
@@ -134,19 +141,18 @@ const ask_query = (query, session_id) => {
 				// Decode the current chunk of data and append it to the text
 				let piece = decoder.decode(value, { stream: true });
 				if(piece == 'None' || piece == '') continue;
-				answer.textContent += piece;
+				answerSpan.innerHTML += piece;
 		
 			}
 			
 		})
 		.catch(error => {
 			console.log(error)
-			answer.textContent +="I am sorry, there is some problem with server host!";
+			answerSpan.innerHTML +="I am sorry, there is some problem with server host!";
 		});
 	}catch(err){
-		answer.textContent +="I am sorry, there is some problem with network, Plz try again after confirming network state!";
+		answerSpan.innerHTML +="I am sorry, there is some problem with network, Plz try again after confirming network state!";
 	}
-	chatOutput.appendChild(answer);
 	chatInput.value = '';
 }
 

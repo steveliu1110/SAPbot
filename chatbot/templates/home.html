@@ -17,8 +17,11 @@
     </div>
     <!-- Sidebar -->
     <div class="flex">
-        <div class="w-64 bg-gray-800 h-screen overflow-y-auto min-w-64">
-            <div class="p-6">
+        <div class="w-64 bg-[#2B2D31] overflow-y-auto min-w-64 rounded-sm">
+            <div class="p-4">
+                <div class="justify-self-end text-2xl text-gray-300">
+                    <i class="fa-regular fa-square-plus" id="new-chat-btn"></i>
+                </div>
                 <h1 class="text-2xl font-bold text-white">Chat History</h1>
                 <ul class="mt-8">
                     {% for session in chat_sessions %}
@@ -33,44 +36,42 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 p-6">
+        <div class="flex-1 bg-[#313338] -px-8 h-screen relative">
             
-            <!-- Navbar with Dark Mode Toggle -->
-            <div class="flex justify-between items-center mb-6">
-                <button id="new-chat-btn" class="px-4 py-2 bg-green-500 text-white rounded-lg">
-                    New Chat
-                </button>
-                <div class="text-2xl font-semibold text-gray-800 dark:text-white">SAP FireCrawl v1.0</div>
-                <button id="theme-toggle" class="w-10 h-10 bg-gray-200 rounded-full dark:bg-gray-700 flex items-center justify-center">
-                    <svg id="sun-icon" class="w-6 h-6 text-yellow-400 dark:text-yellow-300 hidden" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 3a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0V5a4.5 4.5 0 0 1 9 0v1a1 1 0 1 0 2 0V4a6.5 6.5 0 0 0-13 0v2a1 1 0 0 0-1-1zM4 11a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2H4zm14 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2h-2zM12 3a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0V4a4.5 4.5 0 0 1 0 9v1a1 1 0 1 0 2 0v-2a6.5 6.5 0 0 0-13 0v1a1 1 0 1 0 2 0V4a4.5 4.5 0 0 1 9 0v2a1 1 0 1 0 2 0V4a6.5 6.5 0 0 0-13 0z"></path></svg>
-                    <svg id="moon-icon" class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 12a6 6 0 0 0-5.3-5.9A8.96 8.96 0 0 1 12 3a9 9 0 1 0 9 9c0-.8-.1-1.6-.3-2.3a6.2 6.2 0 0 0-3.7-.7 6 6 0 0 0-5.5 2.2c-.8-1-2-1.7-3.4-2a6.3 6.3 0 0 0-3 1 6 6 0 0 0-2.5 4.8C6.5 14.6 9.4 16 12 16c3.3 0 6-2.7 6-6z"></path></svg>
-                </button>
-            </div>
-
-            <!-- ChatGPT-like input and display box -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-8 -px-8 h-[calc(100vh-110px)] border border-black relative">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Chat Box</h3>
-            
-                <!-- Chat Output with Fixed Width and Scrollbar -->
-                <div id="chat-output" class="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-x-auto w-full mb-4">
-                    {% for message in messages %}
-                        {% if message.role == 'user' %}
-                        <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white p-2 rounded-lg my-2">😎 : {{message.content}}</div>
-                        {% elif message.role == 'assistant' %}
-                        <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white p-2 rounded-lg my-2">🤖 : {{message.content}}</div>
-                        {% endif %}
-                    {% endfor %}
+            <div id="chat-output" class="mt-4 p-1 dark:bg-gray-700 overflow-y-auto overflow-x-auto w-full max-h-[calc(100vh-100px)]">
+                <div class="items-center w-full max-h-[calc(100vh-100px)] {% if page == 'home' %}{% else %}hidden{% endif %}" id="about">
+                    <div class="text-white text-[50px] text-center">About Our Service</div>
+                    <img src="{% static 'jpg/voyant.jpg' %}" class="w-[60%] h-[50%] mr-2 mt-10 justify-self-center" />
+                    <img src="{% static 'jpg/visualpak.jpg' %}" class="w-[60%] h-[50%] mr-2 mt-10 justify-self-center" />
                 </div>
-            
-                <!-- Input box with Send button embedded -->
-                <div class="absolute bottom-1 w-[calc(100%-40px)]">
-                    <div class="relative">
-                        <textarea id="chat-input" class="w-full p-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-sm pr-16" rows="1" placeholder="Type your message..."></textarea>
-                        <button id="send-btn" class="absolute top-2 right-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Send</button>
+                <div class="text-2xl font-bold text-white p-6 flex items-center  {% if page == 'chat' %}{% else %}hidden{% endif %} text-[30px]" id="bot-title">
+                    SAP Chatbot
+                </div>
+                {% for message in messages %}
+                    {% if message.role == 'user' %}
+                    <div class="text-white p-2 my-2 flex-1 flex">
+                        <img src="{% static 'png/you.jpg' %}" class="rounded-full w-10 h-10 mr-2" />
+                        <scan class="mr-0">You<br>
+                            {{message.content}}
+                        </scan>    
                     </div>
+                    {% elif message.role == 'assistant' %}
+                    <div class="text-white p-2 my-2 flex-1 flex">
+                        <img src="{% static 'png/bot.png' %}" class="rounded-full w-10 h-10 mr-2" />
+                        <scan class="mr-0">SAP bot<br>
+                            {{message.content}}
+                        </scan>    
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        
+            <!-- Input box with Send button embedded -->
+            <div class="absolute bottom-1 w-[calc(100%-10px)]">
+                <div class="relative">
+                    <textarea id="chat-input" class="w-full p-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow-sm pr-16" rows="1" placeholder="Type your message..."></textarea>
+                    <button id="send-btn" class="absolute top-2 right-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Send</button>
                 </div>
-                
-                
             </div>
         </div>
     </div>

@@ -77,31 +77,32 @@ conversational_rag_chain = RunnableWithMessageHistory(
 
 
 from ..models import Message, ChatSession
+import time
 
 def answer(question, session_id):
     chat_session = ChatSession.objects.get(session_id=session_id)
     messages = Message.objects.filter(chat_session=chat_session).order_by('timestamp')
     message = Message.objects.create(chat_session=chat_session, role='assistant', content='')
-    # content = ''
-    # last_message = ''
-    # if len(messages) > 0:
-    #     last_message = list(messages)[-1].content
-    # print('the last message is ', last_message)
-    stream_out = conversational_rag_chain.stream(
-        {
-            "input": question,
-            # "chat_history": last_message,
-        },
-        config={"configurable": {"session_id": session_id}},
-    )
-    for chunk in stream_out:
-        try:
-            if 'answer' in chunk:
-                print(chunk['answer'], end='')
-                content += chunk['answer']
-                yield chunk['answer']
-        except Exception as err:
-            print(str(err), "error")
+    content = ''
+    # stream_out = conversational_rag_chain.stream(
+    #     {
+    #         "input": question,
+    #         # "chat_history": last_message,
+    #     },
+    #     config={"configurable": {"session_id": session_id}},
+    # )
+    # for chunk in stream_out:
+    #     try:
+    #         if 'answer' in chunk:
+    #             print(chunk['answer'], end='')
+    #             content += chunk['answer']
+    #             yield chunk['answer']
+    #     except Exception as err:
+    #         print(str(err), "error")
+    for i in range(10):
+        content += 'what is that '
+        time.sleep(0.5)
+        yield 'what is that '
     message.content = content
     print('message is ', message)
     message.save()

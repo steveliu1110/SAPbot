@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('ask', views.ask_query, name='ask_query'),
     path('chat/new', views.new_chat, name='new_chat'),
+    path('getnewsession', views.getnewsession, name='get_session'),
     path('chat/session/<str:session_id>', views.chat_session, name='chat_session'),
 
     path('delete-session', views.delete_session, name='delete_session'),
