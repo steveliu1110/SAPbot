@@ -10,7 +10,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 from .vstore import getVectorStore
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, stream=True)
+llm = ChatOpenAI(model="gpt-4o", temperature=0.3, stream=True)
 
 
 vectorstore = getVectorStore()
@@ -18,10 +18,12 @@ retriever = vectorstore.as_retriever()
 
 
 ### Contextualize question ###
-contextualize_q_system_prompt = """Given a chat history and the latest user question about supplier\
-which might reference docs in the chat history, formulate a standalone question \
-which can be understood without the chat history. Do NOT answer the question, \
-just reformulate it if needed and otherwise return it as is."""
+contextualize_q_system_prompt = """
+Given a chat history and the latest user question about SAP suppliers
+which might reference docs in the chat history, formulate a standalone question
+which can be understood without the chat history. Do NOT answer the question
+just reformulate it if needed and otherwise return it as is.
+"""
 contextualize_q_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", contextualize_q_system_prompt),
@@ -35,11 +37,12 @@ history_aware_retriever = create_history_aware_retriever(
 
 
 ### Answer question ###
-qa_system_prompt = """You are an assistant for question-answering tasks about product suppliers, their products, services, online website so on. \
-Refer to the following pieces of scraped data from their online websites to answer the question. \
-If you don't make sense about question, just say that you don't know. \
-Use three sentences maximum and keep the answer concise.\
+qa_system_prompt = """
 
+You are an assistant for question-answering tasks about SAP suppliers, like their products, services, online website so on.
+Refer to the following description about SAP suppliers and also user's previous chat history.
+[Note:1] Do not contain expression like 'Based on the provided document', just answer the question like real human.
+[Note:2] Users often express any suppliers to "my suppliers".
 {context}"""
 qa_prompt = ChatPromptTemplate.from_messages(
     [
@@ -84,25 +87,22 @@ def answer(question, session_id):
     messages = Message.objects.filter(chat_session=chat_session).order_by('timestamp')
     message = Message.objects.create(chat_session=chat_session, role='assistant', content='')
     content = ''
-    # stream_out = conversational_rag_chain.stream(
-    #     {
-    #         "input": question,
-    #         # "chat_history": last_message,
-    #     },
-    #     config={"configurable": {"session_id": session_id}},
-    # )
-    # for chunk in stream_out:
-    #     try:
-    #         if 'answer' in chunk:
-    #             print(chunk['answer'], end='')
-    #             content += chunk['answer']
-    #             yield chunk['answer']
-    #     except Exception as err:
-    #         print(str(err), "error")
-    for i in range(10):
-        content += 'what is that '
-        time.sleep(0.5)
-        yield 'what is that '
+    stream_out = conversational_rag_chain.stream(
+        {
+            "input": question,
+            # "chat_history": last_message,
+        },
+        config={"configurable": {"session_id": session_id}},
+    )
+    for chunk in stream_out:
+        try:
+            if 'answer' in chunk:
+                print(chunk['answer'], end='')
+                content += chunk['answer']
+                yield chunk['answer']
+        except Exception as err:
+            print(str(err), "error")
+    
     message.content = content
     print('message is ', message)
     message.save()

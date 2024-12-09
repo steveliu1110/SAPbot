@@ -139,3 +139,18 @@ INTERNAL_IPS = [
 ]
 
 NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
+
+import os
+
+proxy_url = "91.123.78.167:50100"
+username = "wilbertweavertech"
+password = "ewqMXCVJM2"
+
+# Set up the proxy configuration with authentication
+proxies = {
+    "http": f"http://{username}:{password}@{proxy_url}",
+    "https": f"http://{username}:{password}@{proxy_url}",
+}
+
+os.environ['http_proxy'] = proxies['http']
+os.environ['https_proxy'] = proxies['https']

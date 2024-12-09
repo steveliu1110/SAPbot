@@ -92,7 +92,6 @@ def adminDash(request):
 
 	websites = Website.objects.filter(url__icontains=query).order_by(sort)
 
-	print(websites,'werwe')
 	paginator = Paginator(websites, 10)  # Show 10 websites per page
 	page_number = request.GET.get('page')
 	page_obj = paginator.get_page(page_number)

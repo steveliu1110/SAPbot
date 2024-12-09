@@ -9,6 +9,7 @@ from datetime import datetime
 # custom functions
 from .vstore import updateChroma, getVectorStore
 from .sqlstore import update_scrapy_data
+from .summarize import compress_documents
 
 from ..models import Website
 load_dotenv()
@@ -22,7 +23,7 @@ def update_scrapy(url, chunk_size = 1024, chunk_overlap = 100):
             url=url,  
             mode="crawl",  
             params={
-                "limit":20, 
+                "limit":6, 
                 "maxDepth": 2,
                 "scrapeOptions": {
                     "onlyMainContent": True,
@@ -40,7 +41,9 @@ def update_scrapy(url, chunk_size = 1024, chunk_overlap = 100):
             chunk_overlap=chunk_overlap
         )
         docs = filter_complex_metadata(docs)
-        splits = text_splitter.split_documents(docs)
+        # splits = text_splitter.split_documents(docs)
+        splits = compress_documents(docs)
+        print(splits)
         ids = [f'{url[8:]}_{i}' for i in range(len(splits))]
         #update chroma
         try:
