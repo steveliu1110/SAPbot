@@ -59,8 +59,8 @@
                     </div>
                     {% elif message.role == 'assistant' %}
                     <div class="text-white p-2 my-2 flex-1 flex">
-                        <img src="{% static 'png/bot.png' %}" class="rounded-full w-10 h-10 mr-2" />
-                        <scan class="mr-0">SAP bot<br>
+                        <img src="{% static 'png/bot.png' %}" class="rounded-full w-10 h-10 mr-2"/>
+                        <scan class="mr-0" role="assistant">SAP bot<br>
                             {{message.content}}
                         </scan>    
                     </div>

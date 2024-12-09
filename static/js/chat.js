@@ -10,6 +10,15 @@ newChatBtn.onclick = () => {
 	location.href = '/home';
 }
 
+if(djangoData.getAttribute('data-page') == 'chat'){
+	const assistantMsgs = document.querySelectorAll('[role="assistant"]');
+	assistantMsgs.forEach(span => {
+		span.innerHTML = marked.parse(span.innerHTML);
+	});
+
+}
+
+
 const sendBtn = document.getElementById('send-btn');
 
 function answerDiv(){
@@ -47,6 +56,7 @@ sendBtn.addEventListener('click', async() => {
 	const query = chatInput.value.trim();
 	appendQuery(query, chatOutput);
 	const answer = answerDiv();
+	let answerMarkdown = '';
 	const answerSpan = answer.children[1];
 	chatOutput.append(answer);
 
@@ -83,7 +93,8 @@ sendBtn.addEventListener('click', async() => {
 					// Decode the current chunk of data and append it to the text
 					let piece = decoder.decode(value, { stream: true });
 					if(piece == 'None' || piece == '') continue;
-					answerSpan.innerHTML += piece;
+					answerMarkdown += piece;
+					answerSpan.innerHTML = marked.parse(answerMarkdown);
 			
 				}
 				fetch('/getnewsession', {
@@ -117,6 +128,7 @@ const ask_query = (query, session_id, answerSpan) => {
 	formData.append('query', query);
 	formData.append('session_id', session_id);
 	try{
+		let answerMarkdown = '';
 		fetch("/ask", {
 			method: 'POST',
 			body: formData,
@@ -141,7 +153,8 @@ const ask_query = (query, session_id, answerSpan) => {
 				// Decode the current chunk of data and append it to the text
 				let piece = decoder.decode(value, { stream: true });
 				if(piece == 'None' || piece == '') continue;
-				answerSpan.innerHTML += piece;
+				answerMarkdown += piece;
+				answerSpan.innerHTML = marked.parse(answerMarkdown);
 		
 			}
 			

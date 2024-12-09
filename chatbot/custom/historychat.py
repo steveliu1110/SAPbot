@@ -81,6 +81,7 @@ conversational_rag_chain = RunnableWithMessageHistory(
 
 from ..models import Message, ChatSession
 import time
+	
 
 def answer(question, session_id):
     chat_session = ChatSession.objects.get(session_id=session_id)
